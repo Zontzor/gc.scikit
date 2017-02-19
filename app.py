@@ -3,13 +3,12 @@ import pandas as pd
 from pandas.tools.plotting import scatter_matrix
 import matplotlib.pyplot as plt
 from sklearn import model_selection
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import SVC
 from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import ElasticNet
+from sklearn.linear_model import BayesianRidge
+from sklearn.linear_model import perceptron
 
 # Load dataset
 input_file = "blood-glucose-results.csv"
@@ -56,4 +55,24 @@ lr = LinearRegression()
 lr.fit(X_train, Y_train)
 predictions = lr.predict(X_train)
 print(X_train)
+print (predictions)
+
+rid = Ridge()
+rid.fit(X_train, Y_train)
+predictions = rid.predict(X_train)
+print (predictions)
+
+las = Lasso(alpha=0.1)
+las.fit(X_train, Y_train)
+predictions = las.predict(X_train)
+print (predictions)
+
+en = ElasticNet()
+en.fit(X_train, Y_train)
+predictions = en.predict(X_train)
+print (predictions)
+
+br = BayesianRidge()
+br.fit(X_train, Y_train)
+predictions = br.predict(X_train)
 print (predictions)
