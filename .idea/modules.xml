@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/machine-learning-tut.iml" filepath="$PROJECT_DIR$/.idea/machine-learning-tut.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/gc.scikit.iml" filepath="$PROJECT_DIR$/.idea/gc.scikit.iml" />
     </modules>
   </component>
 </project>
