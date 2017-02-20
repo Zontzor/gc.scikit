@@ -49,7 +49,7 @@ validation_size = 0.20
 seed = 7
 X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
 
-
+"""
 # Make predictions on validation dataset
 lr = LinearRegression()
 lr.fit(X_train, Y_train)
@@ -76,3 +76,26 @@ br = BayesianRidge()
 br.fit(X_train, Y_train)
 predictions = br.predict(X_train)
 print (predictions)
+"""
+
+# Spot Check Algorithms
+models = []
+models.append(('LR', LinearRegression()))
+models.append(('RID', Ridge()))
+models.append(('LAS', Lasso()))
+models.append(('EN', ElasticNet()))
+models.append(('BR', BayesianRidge()))
+
+# Test options and evaluation metric
+seed = 7
+scoring = 'mean_squared_error'
+
+# evaluate each model in turn
+results = []
+names = []
+for name, model in models:
+    cv_results = model_selection.cross_val_score(model, X_train, Y_train)
+    results.append(cv_results)
+    names.append(name)
+    msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+    print(msg)
