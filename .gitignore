@@ -1,6 +1,7 @@
 *.pyc
 *.sql
 *.csv
+*.pkl
 config.txt
 
 # User-specific stuff:
