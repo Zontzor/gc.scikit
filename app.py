@@ -1,7 +1,8 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
-from flask import Flask,request, jsonify
+from flask import Flask,request, jsonify, json
 from pandas.tools.plotting import scatter_matrix
 from sklearn import model_selection
 from sklearn.linear_model import LinearRegression
@@ -13,6 +14,7 @@ from sklearn.externals import joblib
 
 app = Flask(__name__)
 
+
 # Load dataset
 input_file = "blood-glucose-results.csv"
 dataset = pd.read_csv(input_file, header = 0)
@@ -22,25 +24,42 @@ model_directory = 'model'
 model_file_name = '%s/model.pkl' % model_directory
 
 
+def get_input_from_json(input_json):
+    return np.array(
+        [[
+            input_json['timestamp'],
+            input_json['bg_value'],
+            input_json['carbs'],
+            input_json['exercise']
+        ]]
+    )
+
+
 @app.route('/predict', methods=['POST'])
 def predict():
-    return
+    clf = joblib.load(model_file_name)
+
+    X = get_input_from_json(request.json)
+
+    predicition = clf.predict(X)
+
+    return jsonify(predicition)
 
 
 @app.route('/train', methods=['GET'])
 def train():
     # Split-out validation dataset
     array = dataset.values
-    X = array[:, 0:4]
-    Y = array[:, 4]
+    x = array[:, 0:4]
+    y = array[:, 4]
     validation_size = 0.20
     seed = 7
-    X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size,
+    x_train, x_validation, y_train, y_validation = model_selection.train_test_split(x, y, test_size=validation_size,
                                                                                     random_state=seed)
 
     lr = LinearRegression()
-    lr.fit(X_train, Y_train)
-    predictions = lr.predict(X_validation)
+    lr.fit(x_train, y_train)
+    predictions = lr.predict(x_validation)
     print(predictions)
 
     joblib.dump(lr, model_file_name)
