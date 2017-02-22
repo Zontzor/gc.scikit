@@ -58,7 +58,9 @@ def get_input_from_json(input_json):
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    model_file_name = model_directory + '/model.pkl'
+    user_id = str(request.get_json()['userid'])
+
+    model_file_name = model_directory + model_prefix + user_id + model_ext
     clf = joblib.load(model_file_name)
 
     X = get_input_from_json(request.json)
