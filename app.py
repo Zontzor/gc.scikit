@@ -41,7 +41,7 @@ def predict():
 
     X = get_input_from_json(request.json)
 
-    predicition = clf.predict(X)
+    predicition = clf.predict(X)[0]
 
     return jsonify(predicition)
 
