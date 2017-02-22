@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from flask import Flask,request, jsonify, json
+from flask import Flask,request, jsonify
+from sqlalchemy import Column, Integer, Float, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
 from pandas.tools.plotting import scatter_matrix
 from sklearn import model_selection
 from sklearn.linear_model import LinearRegression
@@ -14,6 +16,24 @@ from sklearn.externals import joblib
 
 app = Flask(__name__)
 
+BASE = declarative_base()
+
+"""
+Classes for ORM
+"""
+
+
+class Users(BASE):
+    __tablename__ = 'users'
+    id = Column('id', Integer, primary_key=True)
+    username = Column('u_username', String(30))
+    password = Column('u_password_hash', String(30))
+    email = Column('u_email', String(30))
+    firstname = Column('u_firstname', String(30))
+    weight = Column('u_weight', Float)
+    height = Column('u_height', Integer)
+    date_created = Column('u_date_created', DateTime)
+    profile_image_path = Column('u_profile_image_path', String(100))
 
 # Load dataset
 input_file = "blood-glucose-results.csv"
@@ -21,7 +41,8 @@ dataset = pd.read_csv(input_file, header = 0)
 
 # Load dir
 model_directory = 'model'
-model_file_name = '%s/model.pkl' % model_directory
+model_prefix = '/model_user_'
+model_ext = '.pkl'
 
 
 def get_input_from_json(input_json):
@@ -37,6 +58,7 @@ def get_input_from_json(input_json):
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    model_file_name = model_directory + '/model.pkl'
     clf = joblib.load(model_file_name)
 
     X = get_input_from_json(request.json)
@@ -46,8 +68,10 @@ def predict():
     return jsonify(predicition)
 
 
-@app.route('/train', methods=['GET'])
+@app.route('/train', methods=['POST'])
 def train():
+    user_id = str(request.get_json()['userid'])
+
     # Split-out validation dataset
     array = dataset.values
     x = array[:, 0:4]
@@ -62,6 +86,7 @@ def train():
     predictions = lr.predict(x_validation)
     print(predictions)
 
+    model_file_name = model_directory + model_prefix + user_id + model_ext
     joblib.dump(lr, model_file_name)
 
     return 'Success'
