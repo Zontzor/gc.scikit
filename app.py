@@ -48,10 +48,11 @@ model_ext = '.pkl'
 def get_input_from_json(input_json):
     return np.array(
         [[
-            input_json['timestamp'],
+            input_json['pf_time_of_day'],
             input_json['bg_value'],
-            input_json['carbs'],
-            input_json['exercise']
+            input_json['food_value'],
+            input_json['exercise_value'],
+            input_json['ins_value']
         ]]
     )
 
@@ -73,6 +74,10 @@ def predict():
 @app.route('/train', methods=['POST'])
 def train():
     user_id = str(request.get_json()['userid'])
+
+    #print_csv_details()
+    #show_graphs()
+    compare_algos()
 
     # Split-out validation dataset
     array = dataset.values
@@ -105,12 +110,12 @@ def print_csv_details():
     print(dataset.describe())
 
     # class distribution
-    print(dataset.groupby('timestamp').size())
+    print(dataset.groupby('pf_time_of_day').size())
 
 
 def show_graphs():
     # box and whisker plots
-    dataset.plot(kind='box', subplots=True, layout=(2, 2), sharex=False, sharey=False)
+    dataset.plot(kind='box', subplots=True, layout=(3, 2), sharex=False, sharey=False)
     plt.show()
 
     # histograms
@@ -140,10 +145,6 @@ def compare_algos():
     models.append(('EN', ElasticNet()))
     models.append(('BR', BayesianRidge()))
 
-    # Test options and evaluation metric
-    seed = 7
-    scoring = 'mean_squared_error'
-
     # evaluate each model in turn
     results = []
     names = []
@@ -153,6 +154,14 @@ def compare_algos():
         names.append(name)
         msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
         print(msg)
+
+    # Compare Algorithms
+    fig = plt.figure()
+    fig.suptitle('Algorithm Comparison')
+    ax = fig.add_subplot(111)
+    plt.boxplot(results)
+    ax.set_xticklabels(names)
+    plt.show()
 
 
 if __name__ == '__main__':
